@@ -108,6 +108,7 @@ class PhotoViewGallery extends StatefulWidget {
     this.backgroundDecoration,
     this.gaplessPlayback = false,
     this.reverse = false,
+    this.index,
     this.pageController,
     this.onPageChanged,
     this.scaleStateChangedCallback,
@@ -127,6 +128,7 @@ class PhotoViewGallery extends StatefulWidget {
     Key? key,
     required this.itemCount,
     required this.builder,
+    this.index,
     this.loadingBuilder,
     this.backgroundDecoration,
     this.gaplessPlayback = false,
@@ -149,6 +151,11 @@ class PhotoViewGallery extends StatefulWidget {
 
   /// The count of items in the gallery, only used when constructed via [PhotoViewGallery.builder]
   final int? itemCount;
+
+  ///Index number of initial slide.
+  ///If not set , the `gallery` is 'uncontrolled', which means manage index by itself
+  ///If set , the `Swiper` is 'controlled', which means the index is fully managed by parent widget.
+  final int? index;
 
   /// Called to build items for the gallery when using [PhotoViewGallery.builder]
   final PhotoViewGalleryBuilder? builder;
@@ -198,8 +205,7 @@ class PhotoViewGallery extends StatefulWidget {
 }
 
 class _PhotoViewGalleryState extends State<PhotoViewGallery> {
-  late final PageController _controller =
-      widget.pageController ?? PageController();
+  late final PageController _controller;
 
   void scaleStateChangedCallback(PhotoViewScaleState scaleState) {
     if (widget.scaleStateChangedCallback != null) {
@@ -216,6 +222,20 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
       return widget.itemCount!;
     }
     return widget.pageOptions!.length;
+  }
+
+  @override
+  void initState() {
+   _controller = widget.pageController ?? PageController(initialPage: widget.index ?? 0);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    if(widget.pageController == null){
+      _controller.dispose();
+    }
+    super.dispose();
   }
 
   @override
