@@ -76,9 +76,6 @@ class PhotoViewGestureDetector extends StatelessWidget {
             },
           );
     }
-
-
-
     return RawGestureDetector(
       behavior: behavior,
       gestures: gestures,
@@ -88,6 +85,7 @@ class PhotoViewGestureDetector extends StatelessWidget {
 }
 
 class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
+
   PhotoViewGestureRecognizer({
     this.hitDetector,
     Object? debugOwner,
@@ -124,7 +122,9 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     if (validateAxis != null) {
       _computeEvent(event);
       _updateDistances();
-      _decideIfWeAcceptEvent(event);
+      if(!_decideIfWeAcceptEvent(event)){
+        return;
+      }
     }
     super.handleEvent(event);
   }
@@ -153,18 +153,18 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
         count > 0 ? focalPoint / count.toDouble() : Offset.zero;
   }
 
-  void _decideIfWeAcceptEvent(PointerEvent event) {
+  bool _decideIfWeAcceptEvent(PointerEvent event) {
     if (event is! PointerMoveEvent) {
-      return;
+      return true;
     }
-
     final move = _initialFocalPoint! - _currentFocalPoint!;
-
-
-
     final bool shouldMove = hitDetector!.shouldMove(move, validateAxis!);
     if (shouldMove || _pointerLocations.keys.length > 1) {
       acceptGesture(event.pointer);
+      return true;
+    }else{
+      rejectGesture(event.pointer);
+      return false;
     }
   }
 }

@@ -64,7 +64,6 @@ mixin HitCornersDetector on PhotoViewControllerDelegate {
     }
 
     final moveY = _shouldMoveY(move);
-
     if(move.dy < 0 && !moveY){
       return false;
     }
